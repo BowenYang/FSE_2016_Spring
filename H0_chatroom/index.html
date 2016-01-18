@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FSE chatroom</title>
+    <!-- Bootstrap core CSS -->
+    <!-- <link href="./public/css/bootstrap.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Specify CSS information by myself since the bootstrap is not working for some reason. -->
+    <style>
+      body{
+        TEXT-ALIGN: center;
+      }
+      #center{ 
+        MARGIN-RIGHT: auto;
+        MARGIN-LEFT: auto; 
+        vertical-align:middle;
+        line-height:200px;
+      }
+      .container {
+        display: inline-block;
+        border: 3px solid #484848;  
+      }
+      .button {
+        background-color: #008CBA;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+      ul {
+        background: #e8e8e8;
+        padding: 5px;
+        font-family: Arial, Helvetica, sans-serif;
+        list-style-type: none;
+        text-align: left;
+      }
+      ul li {
+        background: #cce5ff;
+        margin: 5px;
+        padding: 5px;
+        margin-left: 35px;
+        margin-right: 35px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <ul id="messages"></ul>
+      <form action="">
+        <input id="m" autocomplete="off" class="form-control" placeholder="Message" style="90%"> 
+        <br>
+        <button class="button">Send</button>
+      </form>
+      <script src="/socket.io/socket.io.js"></script>
+      <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+      <script>
+        var socket = io();
+        function currenttime() {
+          var date = new Date();
+          var time = '('+(date.getMonth() + 1)+ '.' + date.getDate() + '.' + date.getFullYear()  + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? ('0' + date.getMinutes()) : date.getMinutes()) + ')';
+          return time;
+        }
+        $('form').submit(function(){
+          //emit the message from client
+          socket.emit('chat message', $('#m').val()+' '+currenttime());
+          //Clear the input box
+          $('#m').val('');
+          return false;
+        });
+        socket.on('chat message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+          // $('#messages').append($('<br>').text(msg));
+        });
+        socket.on('connect', function(data){
+          $('#status').html('connect to FSE chatroom.');
+          nickname = prompt("what is your nickname?");
+          socket.emit('join', nickname);
+        });
+      </script>
+    </div>
+  </body>
+</html>
